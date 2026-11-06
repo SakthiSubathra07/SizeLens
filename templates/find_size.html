@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+{% block title %}Find My Size – SizeLens{% endblock %}
+
+{% block content %}
+<div class="page-title">
+  <h1>Find My Size</h1>
+  <p>Select a brand and category, enter your measurements, choose a fit — done.</p>
+</div>
+
+{% if errors %}
+<div class="error-box" role="alert">
+  <strong>Please fix the following:</strong>
+  <ul>
+    {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+  </ul>
+</div>
+{% endif %}
+
+<form method="post" action="{{ url_for('main.find_size') }}" novalidate
+      class="card card-padded form-stack mt-4">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+  {# ── Brand & Category ── #}
+  <fieldset>
+    <legend>Brand &amp; Category</legend>
+    <div class="field-row mt-4">
+      <label for="brand_id">
+        Brand
+        <select id="brand_id" name="brand_id" required>
+          <option value="">— select brand —</option>
+          {% for b in brands %}
+          <option value="{{ b.id }}"
+            {% if form.get('brand_id')|string == b.id|string %}selected{% endif %}>
+            {{ b.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label for="category_id">
+        Category
+        <select id="category_id" name="category_id" required>
+          <option value="">— select category —</option>
+          {% for c in categories %}
+          <option value="{{ c.id }}"
+            {% if form.get('category_id')|string == c.id|string %}selected{% endif %}>
+            {{ c.name }}
+          </option>
+          {% endfor %}
+        </select>
+      </label>
+    </div>
+  </fieldset>
+
+  {# ── Fit preference ── #}
+  <fieldset>
+    <legend>Fit Preference</legend>
+    <div class="radio-group mt-4">
+      {% for value, title, desc in [
+          ('slim',    'Slim',    'Snug, close to body'),
+          ('regular', 'Regular', 'Standard everyday fit'),
+          ('loose',   'Loose',   'Relaxed, extra room'),
+      ] %}
+      <div class="radio-option">
+        <input type="radio" id="fit_{{ value }}" name="fit_pref" value="{{ value }}"
+          {% if (form.get('fit_pref') or 'regular') == value %}checked{% endif %}>
+        <label for="fit_{{ value }}">
+          {{ title }}
+          <span class="radio-desc">{{ desc }}</span>
+        </label>
+      </div>
+      {% endfor %}
+    </div>
+  </fieldset>
+
+  {# ── Measurements ── #}
+  <fieldset>
+    <legend>Your Measurements (cm)</legend>
+
+    {# cat_measurements: { cat_id: ['chest', 'shoulder', ...] } — passed from view #}
+    {# We render all fields; labels show which category uses each. #}
+    {% set ms_to_cats = [
+      ('height',   'All (optional)', '50', '250', 'e.g. 175'),
+      ('chest',    'T-shirt',        '50', '200', 'e.g. 90'),
+      ('shoulder', 'T-shirt',        '20', '80',  'e.g. 40'),
+      ('waist',    'T-shirt · Jeans','40', '200', 'e.g. 74'),
+      ('hip',      'Jeans',          '50', '200', 'e.g. 95'),
+      ('inseam',   'Jeans',          '20', '120', 'e.g. 81'),
+    ] %}
+
+    <div class="field-row cols-3 mt-4">
+      {% for m_name, used_for, m_min, m_max, ph in ms_to_cats %}
+      <label for="{{ m_name }}">
+        {{ m_name | capitalize }}
+        <small>{{ used_for }}</small>
+        <input type="number" id="{{ m_name }}" name="{{ m_name }}"
+               step="0.1" min="{{ m_min }}" max="{{ m_max }}"
+               value="{{ form.get(m_name) or '' }}"
+               placeholder="{{ ph }} cm">
+      </label>
+      {% endfor %}
+    </div>
+    <p class="text-sm text-muted mt-4">
+      Not sure how to measure?
+      <a href="{{ url_for('main.guide') }}">See the measurement guide →</a>
+    </p>
+  </fieldset>
+
+  <fieldset>
+    <legend>Save your measurements</legend>
+    {% if g.user %}
+    <label class="checkbox-option" for="save_profile">
+      <input type="checkbox" id="save_profile" name="save_profile" value="on"
+        {% if form.get('save_profile') == 'on' %}checked{% endif %}>
+      <span>Save these measurements to my profile for next time</span>
+    </label>
+    {% else %}
+    <p class="text-sm text-muted">
+      Saving is optional. <a href="{{ url_for('main.register') }}">Create an account</a>
+      or <a href="{{ url_for('main.login') }}">log in</a> to save and reuse your measurements.
+    </p>
+    {% endif %}
+  </fieldset>
+
+  <div class="form-actions">
+    <button type="submit" class="btn btn-primary">Get recommendation →</button>
+  </div>
+
+</form>
+{% endblock %}

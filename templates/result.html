@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+{% block title %}Size Result – SizeLens{% endblock %}
+
+{% block content %}
+{% if error %}
+<section class="card card-padded no-match-card" role="alert">
+  <span class="eyebrow">We couldn't make a recommendation</span>
+  <h1>Something went wrong</h1>
+  <p>{{ error }}</p>
+  <a href="{{ url_for('main.find_size') }}" class="btn btn-primary">Try again</a>
+</section>
+{% elif rec.no_match %}
+<section class="card card-padded no-match-card" aria-labelledby="no-match-title">
+  <span class="eyebrow">Fit check</span>
+  <div class="no-match-icon" aria-hidden="true">↗</div>
+  <h1 id="no-match-title">No good match</h1>
+  <p>
+    We couldn't find a close fit in <strong>{{ brand }}</strong>'s
+    {{ category }} chart. Check your measurements or try another brand.
+  </p>
+  <div class="hero-actions">
+    <a href="{{ url_for('main.find_size') }}" class="btn btn-primary">Try another brand</a>
+    <a href="{{ url_for('main.guide') }}" class="btn btn-ghost">Measurement guide</a>
+  </div>
+</section>
+
+{% if closest_size %}
+{% set closest_bd = rec.breakdown.get(closest_size, {}) %}
+{% if closest_bd %}
+<section class="card card-padded mt-5" aria-labelledby="comparison-title">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Closest chart size: {{ closest_size }}</span>
+      <h2 id="comparison-title">Measurement breakdown</h2>
+    </div>
+  </div>
+  <ul class="explanation-list">
+    {% for m_name, entry in closest_bd.items() %}
+    {% set bv = entry.body_value %}
+    {% set lo = entry.min_cm %}
+    {% set hi = entry.max_cm %}
+    {% set dev = entry.difference %}
+    {% set ease = display_ease.get(m_name, 0) %}
+    {% set compared_value = bv + ease %}
+    <li>
+      {% if dev == 0 %}
+      <span class="icon" aria-hidden="true">✓</span>
+      <span>{% if ease %}Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm + {{ "%.1f"|format(ease) }} cm chart ease) matches {{ closest_size }}'s range {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.{% else %}Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm) is within {{ closest_size }}'s range {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.{% endif %}</span>
+      {% elif compared_value < lo %}
+      <span class="icon" aria-hidden="true">↑</span>
+      <span>Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm{% if ease %} + {{ "%.1f"|format(ease) }} cm chart ease{% endif %}) is {{ "%.1f"|format(dev) }} cm below {{ closest_size }}'s range of {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.</span>
+      {% else %}
+      <span class="icon" aria-hidden="true">↓</span>
+      <span>Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm{% if ease %} + {{ "%.1f"|format(ease) }} cm chart ease{% endif %}) is {{ "%.1f"|format(dev) }} cm above {{ closest_size }}'s range of {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+  <p class="table-caption">Difference is measured against the chart range{% if chart_type == 'garment' %} after applying garment ease{% endif %}.</p>
+  <div class="table-wrap mt-5">
+    <table class="measurement-table">
+      <thead>
+        <tr><th scope="col">Measurement</th><th scope="col">Your value</th><th scope="col">Chart range</th><th scope="col">Difference</th></tr>
+      </thead>
+      <tbody>
+        {% for m_name, entry in closest_bd.items() %}
+        <tr>
+          <td data-label="Measurement">{{ m_name|capitalize }}</td>
+          <td data-label="Your value">{{ "%.1f"|format(entry.body_value) }} cm</td>
+          <td data-label="Chart range">{{ "%.1f"|format(entry.min_cm) }}–{{ "%.1f"|format(entry.max_cm) }} cm</td>
+          <td data-label="Difference">{% if entry.difference == 0 %}0.0 cm{% else %}{{ "%.1f"|format(entry.difference) }} cm{% endif %}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endif %}
+
+{% if rec.scores %}
+<section class="card card-padded mt-5">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Chart comparison</span>
+      <h2>Scores for every size</h2>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Size</th><th scope="col">Score (lower is closer)</th></tr></thead>
+      <tbody>
+        {% for label, score in rec.scores.items() %}
+        <tr {% if label == closest_size %}class="best-row"{% endif %}>
+          <td>{{ label }}</td><td>{{ "%.2f"|format(score) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% else %}
+{% set best_bd = rec.breakdown.get(rec.best_size, {}) %}
+<section class="card card-padded result-hero-card" aria-labelledby="recommendation-title">
+  <div class="result-hero">
+    <div class="recommended-size">
+      <div class="size-badge" aria-label="Recommended size {{ rec.best_size }}"><strong>{{ rec.best_size }}</strong></div>
+      <span class="size-badge-label">Recommended size</span>
+    </div>
+    <div class="result-details">
+      <span class="eyebrow">Your fit, figured out</span>
+      <h1 id="recommendation-title">{{ brand }} <span aria-hidden="true">·</span> {{ category }}</h1>
+      <div class="confidence-row">
+        <span class="confidence-badge confidence-{{ rec.confidence }}">
+          {% if rec.confidence == 'high' %}High confidence
+          {% elif rec.confidence == 'medium' %}Medium confidence
+          {% else %}Low confidence{% endif %}
+        </span>
+        <span class="confidence-note">Based on your measurements and this size chart</span>
+      </div>
+      {% if out_of_stock_size %}
+      <div class="availability-alert" role="status">
+        <strong>Size {{ out_of_stock_size }} is out of stock.</strong>
+        {% if alternative_size %}
+        <span>Closest available alternative: <strong>{{ alternative_size }}</strong>
+          <span class="availability-score">(score {{ "%.2f"|format(rec.scores[alternative_size]) }})</span>
+        </span>
+        {% else %}
+        <span>There are no other available sizes in this chart.</span>
+        {% endif %}
+      </div>
+      {% endif %}
+      <div class="result-meta">
+        <span><strong>Fit:</strong> {{ fit_pref|capitalize }}</span>
+        <span><strong>Chart:</strong> {{ chart_type|capitalize }}</span>
+        {% if rec.runner_up %}
+        <span class="runner-up">Runner-up <strong>{{ rec.runner_up }}</strong></span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+
+{% if best_bd %}
+<section class="card card-padded mt-5" aria-labelledby="explanation-title">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Why this size</span>
+      <h2 id="explanation-title">Your measurements, explained</h2>
+    </div>
+  </div>
+  <ul class="explanation-list">
+    {% for m_name, entry in best_bd.items() %}
+    {% set bv = entry.body_value %}
+    {% set lo = entry.min_cm %}
+    {% set hi = entry.max_cm %}
+    {% set dev = entry.difference %}
+    {% set ease = display_ease.get(m_name, 0) %}
+    {% set compared_value = bv + ease %}
+    <li>
+      {% if dev == 0 %}
+      <span class="icon fit-ok" aria-hidden="true">✓</span>
+      <span>{% if ease %}Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm + {{ "%.1f"|format(ease) }} cm chart ease) matches {{ rec.best_size }}'s range {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.{% else %}Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm) is within {{ rec.best_size }}'s range {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.{% endif %}</span>
+      {% elif compared_value < lo %}
+      <span class="icon" aria-hidden="true">↑</span>
+      <span>Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm{% if ease %} + {{ "%.1f"|format(ease) }} cm chart ease{% endif %}) is {{ "%.1f"|format(dev) }} cm below {{ rec.best_size }}'s range of {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.</span>
+      {% else %}
+      <span class="icon" aria-hidden="true">↓</span>
+      <span>Your {{ m_name }} ({{ "%.1f"|format(bv) }} cm{% if ease %} + {{ "%.1f"|format(ease) }} cm chart ease{% endif %}) is {{ "%.1f"|format(dev) }} cm above {{ rec.best_size }}'s range of {{ "%.1f"|format(lo) }}–{{ "%.1f"|format(hi) }} cm.</span>
+      {% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+</section>
+
+<section class="card card-padded mt-5" aria-labelledby="breakdown-title">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Size {{ rec.best_size }}</span>
+      <h2 id="breakdown-title">Measurement breakdown</h2>
+    </div>
+  </div>
+  <p class="table-caption">Difference is measured against the chart range{% if chart_type == 'garment' %} after applying garment ease{% endif %}.</p>
+  <div class="table-wrap">
+    <table class="measurement-table">
+      <thead>
+        <tr><th scope="col">Measurement</th><th scope="col">Your value</th><th scope="col">Chart range</th><th scope="col">Difference</th></tr>
+      </thead>
+      <tbody>
+        {% for m_name, entry in best_bd.items() %}
+        <tr>
+          <td data-label="Measurement">{{ m_name|capitalize }}</td>
+          <td data-label="Your value">{{ "%.1f"|format(entry.body_value) }} cm</td>
+          <td data-label="Chart range">{{ "%.1f"|format(entry.min_cm) }}–{{ "%.1f"|format(entry.max_cm) }} cm</td>
+          <td data-label="Difference">
+            {% if entry.difference == 0 %}<span class="dev-zero">0.0 cm</span>
+            {% else %}<span class="dev-nonzero">{{ "%.1f"|format(entry.difference) }} cm</span>{% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+
+{% if rec.scores %}
+<section class="card card-padded mt-5">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Chart comparison</span>
+      <h2>Scores for every size</h2>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th scope="col">Size</th><th scope="col">Score (lower is closer)</th></tr></thead>
+      <tbody>
+        {% for label, score in rec.scores.items() %}
+        <tr {% if label == rec.best_size %}class="best-row"{% endif %}>
+          <td>{{ label }}{% if label == rec.runner_up %}<span class="table-note">Runner-up</span>{% endif %}</td>
+          <td>{{ "%.2f"|format(score) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endif %}
+{% endif %}
+
+<div class="mt-6">
+  <a href="{{ url_for('main.find_size') }}" class="btn btn-ghost">← Try another size</a>
+</div>
+{% endblock %}

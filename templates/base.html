@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}SizeLens{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='tokens.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+  <header class="site-header">
+    <div class="nav-container">
+      <a href="{{ url_for('main.index') }}" class="brand-logo">SizeLens</a>
+      <nav class="main-nav" aria-label="Main navigation">
+        <a href="{{ url_for('main.index') }}" class="nav-link"
+          {% if request.endpoint == 'main.index' %}aria-current="page"{% endif %}>
+          Home
+        </a>
+        <a href="{{ url_for('main.find_size') }}" class="nav-link"
+          {% if request.endpoint in ('main.find_size', 'main.result') %}aria-current="page"{% endif %}>
+          Find my size
+        </a>
+        <a href="{{ url_for('main.guide') }}" class="nav-link"
+          {% if request.endpoint == 'main.guide' %}aria-current="page"{% endif %}>
+          Guide
+        </a>
+        <a href="{{ url_for('main.profile') }}" class="nav-link"
+          {% if request.endpoint == 'main.profile' %}aria-current="page"{% endif %}>
+          My profile
+        </a>
+        {% if g.user %}
+        <a href="{{ url_for('main.history') }}" class="nav-link"
+          {% if request.endpoint == 'main.history' %}aria-current="page"{% endif %}>
+          History
+        </a>
+        <form method="post" action="{{ url_for('main.logout') }}" class="nav-logout">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="nav-link nav-button">Log out</button>
+        </form>
+        {% else %}
+        <a href="{{ url_for('main.login') }}" class="nav-link"
+          {% if request.endpoint == 'main.login' %}aria-current="page"{% endif %}>
+          Log in
+        </a>
+        {% endif %}
+      </nav>
+    </div>
+  </header>
+
+  <main class="page-wrapper">
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer class="site-footer">
+    <p>© SizeLens &mdash; Rule-based clothing size recommendations.</p>
+  </footer>
+
+</body>
+</html>

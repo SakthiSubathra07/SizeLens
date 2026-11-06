@@ -1,0 +1,24 @@
+/*
+ * tokens.css  –  SizeLens design tokens
+ *
+ * Palette:
+ *   Rose        – primary actions and accents
+ *   Burgundy    – recommended-size badge
+ *   Wine night  – page background
+ *   Surface     – cards and panels
+ */
+
+:root {
+  --rose: #E07A8F;      /* buttons, links */
+  --blush: #F2B5C1;     /* accent text */
+  --burgundy: #7A1F36;  /* size circle */
+  --gold: #D9B26F;      /* accents */
+  --text: #F7ECEE;
+  --muted: #C9A9B1;
+  --bg: #1A0A10;
+  --surface: #2A1219;
+  --line: #4A2330;
+  --ok: #6EDC9F;
+  --warn: #F2B84B;
+  --bad: #FF7A66;
+}

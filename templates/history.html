@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% block title %}Recommendation History – SizeLens{% endblock %}
+{% block content %}
+<header class="page-title">
+  <span class="eyebrow">Saved for your account</span>
+  <h1>Recommendation history</h1>
+  <p>Your logged-in size recommendations, newest first.</p>
+</header>
+
+{% if entries %}
+<section class="card card-padded">
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th scope="col">Date</th>
+          <th scope="col">Brand</th>
+          <th scope="col">Category</th>
+          <th scope="col">Size</th>
+          <th scope="col">Fit</th>
+          <th scope="col">Score</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for entry in entries %}
+        <tr>
+          <td>{{ entry.created_at }}</td>
+          <td>{{ entry.brand }}</td>
+          <td>{{ entry.category }}</td>
+          <td><strong>{{ entry.size_label }}</strong></td>
+          <td>{{ entry.fit_pref|capitalize }}</td>
+          <td>{{ "%.2f"|format(entry.score) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% else %}
+<section class="card card-padded empty-history">
+  <h2>No recommendations yet</h2>
+  <p>Recommendations you get while logged in will appear here.</p>
+  <a href="{{ url_for('main.find_size') }}" class="btn btn-primary mt-4">Find my size</a>
+</section>
+{% endif %}
+{% endblock %}

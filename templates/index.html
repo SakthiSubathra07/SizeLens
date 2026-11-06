@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block title %}SizeLens – Smart Clothing Size Recommendations{% endblock %}
+
+{% block content %}
+<div class="card card-padded hero-section">
+  <h1>Find your perfect fit,<br>every time.</h1>
+  <p>Enter your body measurements, pick a brand and category, and get a size
+  recommendation grounded in real chart data — no guessing.</p>
+  <div class="hero-actions">
+    <a href="{{ url_for('main.find_size') }}" class="btn btn-primary">Find my size →</a>
+    <a href="{{ url_for('main.guide') }}" class="btn btn-ghost">How to measure</a>
+  </div>
+</div>
+{% endblock %}

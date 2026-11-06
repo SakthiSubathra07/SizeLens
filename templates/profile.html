@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}My Profile – SizeLens{% endblock %}
+{% block content %}
+<header class="page-title">
+  <span class="eyebrow">Your account</span>
+  <h1>My profile</h1>
+  <p>Signed in as <strong>{{ g.user.email }}</strong>. Measurements are only saved when you choose the save option on the size form.</p>
+</header>
+
+<section class="card card-padded">
+  <div class="section-heading">
+    <div>
+      <span class="eyebrow">Saved data</span>
+      <h2>Measurement profile</h2>
+    </div>
+  </div>
+  {% if profile %}
+  <dl class="profile-measurements">
+    {% for name, value in profile.items() %}
+    {% if value is not none %}
+    <div><dt>{{ name|capitalize }}</dt><dd>{{ "%.1f"|format(value) }} cm</dd></div>
+    {% endif %}
+    {% endfor %}
+  </dl>
+  <p class="text-sm text-muted">Your saved measurements automatically prefill the size form.</p>
+  {% else %}
+  <p class="text-muted">You have not saved a measurement profile yet. Choose “Save these measurements to my profile” when getting a recommendation.</p>
+  {% endif %}
+</section>
+
+<section class="card card-padded data-delete-card mt-5">
+  <span class="eyebrow">Permanent action</span>
+  <h2>Delete my data</h2>
+  <p>This permanently deletes your account, saved measurements, and recommendation history. This cannot be undone.</p>
+  <form method="post" action="{{ url_for('main.delete_data') }}" class="mt-4"
+        onsubmit="return confirm('Permanently delete your account and all saved data?');">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+    <button type="submit" class="btn btn-danger">Delete my data</button>
+  </form>
+</section>
+{% endblock %}

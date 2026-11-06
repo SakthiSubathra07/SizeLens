@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Measurement Guide – SizeLens{% endblock %}
+
+{% block content %}
+<header class="page-title guide-intro">
+  <span class="eyebrow">A better fit starts here</span>
+  <h1>How to take your measurements</h1>
+  <p>Use a soft measuring tape, keep it level, and measure over light clothing. The tape should sit comfortably against your body without pulling tight.</p>
+</header>
+
+<section class="guide-grid" aria-label="Measurement instructions">
+  <article class="card card-padded guide-card">
+    <span class="guide-card-icon" aria-hidden="true">↕</span>
+    <h2>Height</h2>
+    <p>Stand barefoot on a hard, level floor with your back against a wall.</p>
+    <ol>
+      <li>Stand straight with your heels against the wall.</li>
+      <li>Look straight ahead and ask someone to mark the top of your head.</li>
+      <li>Measure from the floor to the mark.</li>
+    </ol>
+  </article>
+
+  <article class="card card-padded guide-card">
+    <span class="guide-card-icon" aria-hidden="true">◯</span>
+    <h2>Chest</h2>
+    <p>Measure around the fullest part of your chest, usually across the nipple line.</p>
+    <ol>
+      <li>Wrap the tape under your arms and across your back.</li>
+      <li>Keep the tape level all the way around.</li>
+      <li>Relax your arms and breathe normally while you read it.</li>
+    </ol>
+  </article>
+
+  <article class="card card-padded guide-card">
+    <span class="guide-card-icon" aria-hidden="true">⌁</span>
+    <h2>Shoulder</h2>
+    <p>Measure across the back from one shoulder point to the other.</p>
+    <ol>
+      <li>Find the bony tip at the outer edge of each shoulder.</li>
+      <li>Measure in a straight line between those points across your back.</li>
+      <li>Keep your shoulders relaxed and level.</li>
+    </ol>
+  </article>
+
+  <article class="card card-padded guide-card">
+    <span class="guide-card-icon" aria-hidden="true">◎</span>
+    <h2>Waist</h2>
+    <p>Measure around your waist where your trousers normally sit.</p>
+    <ol>
+      <li>Stand naturally without pulling in your stomach.</li>
+      <li>Wrap the tape around your waist, keeping it parallel to the floor.</li>
+      <li>Leave enough room to slide a finger under the tape.</li>
+    </ol>
+  </article>
+
+  <article class="card card-padded guide-card">
+    <span class="guide-card-icon" aria-hidden="true">◉</span>
+    <h2>Hip</h2>
+    <p>Measure around the fullest part of your hips and seat.</p>
+    <ol>
+      <li>Stand with your feet together and weight evenly distributed.</li>
+      <li>Wrap the tape around the fullest part of your hips and buttocks.</li>
+      <li>Check in a mirror that the tape stays level.</li>
+    </ol>
+  </article>
+
+  <article class="card card-padded guide-card">
+    <span class="guide-card-icon" aria-hidden="true">↘</span>
+    <h2>Inseam</h2>
+    <p>This is the inside-leg length, from the crotch to the ankle.</p>
+    <ol>
+      <li>Stand straight with your feet slightly apart.</li>
+      <li>Measure from the top of the inside leg down to your ankle bone.</li>
+      <li>For easier measuring, use a well-fitting pair of trousers laid flat.</li>
+    </ol>
+  </article>
+</section>
+
+<aside class="guide-tip mt-6">
+  <strong>Quick tip</strong>
+  <p>Measurements can vary slightly from day to day. For the most consistent result, use the same tape and measuring method each time.</p>
+</aside>
+
+<div class="mt-6">
+  <a href="{{ url_for('main.find_size') }}" class="btn btn-primary">Find my size →</a>
+</div>
+{% endblock %}
