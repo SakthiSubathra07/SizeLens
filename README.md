@@ -7,15 +7,6 @@ and a brand-specific size chart. It includes T-shirt and jeans charts, a
 measurement guide, optional user accounts, saved measurement profiles, and
 recommendation history for logged-in users.
 
-## Screenshots
-
-The image paths below are placeholders. Replace them with screenshots of the
-running application:
-
-- Home: ![SizeLens home page](docs/home.png)
-- Recommendation result: ![Size recommendation result](docs/result.png)
-- No-good-match result: ![No good match result](docs/no-match.png)
-- Profile: ![Saved measurement profile](docs/profile.png)
 
 ## How the algorithm works
 
