@@ -1,12 +1,14 @@
 # SizeLens
 
-## What SizeLens does
+# SizeLens 👕
+### Smart Clothing Size Recommendation System
 
-SizeLens is a Flask app that recommends a clothing size from body measurements
-and a brand-specific size chart. It includes T-shirt and jeans charts, a
-measurement guide, optional user accounts, saved measurement profiles, and
-recommendation history for logged-in users.
+SizeLens is a web application that helps users find their most suitable
+clothing size based on their body measurements and brand-specific size charts.
 
+The application uses a rule-based recommendation algorithm to calculate
+size compatibility, compare measurements, and suggest the best-fitting size
+without relying on machine learning.
 
 ## How the algorithm works
 
